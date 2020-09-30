@@ -84,6 +84,9 @@ nnoremap <C-j> <C-w>j
 " Toggle file explorer with Ctrl + e
 nnoremap <C-e> :Lexplore<CR>
 
+" Map Ctrl + c to Esc
+inoremap <C-c> <Esc>
+
 " ========== Plugins ==========
 
 " Install vim-plug plugin manager if not installed
@@ -96,62 +99,74 @@ endif
 " Directory for plugins
 call plug#begin('~/.vim/plugged')
 
-" Linter
-Plug 'w0rp/ale'
+" Use release branch
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-" Insert brackets, parems, and quotes in pair
-Plug 'jiangmiao/auto-pairs'
-
-" Quick HTML abbreviations
-Plug 'mattn/emmet-vim'
+" Automatic closing of quotes, parenthesis, brackets, etc.
+Plug 'Raimondi/delimitMate'
 
 " PlugInstall and PlugUpdate will clone fzf in ~/.fzf and run install script
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all'  }
 Plug 'junegunn/fzf.vim'
 
+" Better syntax highlighting for jsonc
+Plug 'neoclide/jsonc.vim'
+
+" Status line for tmux
+" Only necessary to generate the snapshot 
+" Plug 'edkolev/tmuxline.vim'
+
 " Status bar
 Plug 'vim-airline/vim-airline'
-
-" Git workflow helper
-Plug 'jreybert/vimagit'
 
 " Dark theme
 Plug 'tomasiser/vim-code-dark'
 
-" Git wrapper
-Plug 'tpope/vim-fugitive'
-
-" Better JavaScript indentation and syntax support
+" Better JavaScript indentation and syntax highlighting
 Plug 'pangloss/vim-javascript'
 
-" Support for JSX
-Plug 'mxw/vim-jsx'
+" Better JSX indentation and syntax highlighting
+Plug 'maxmellon/vim-jsx-pretty'
 
-" Status line for tmux
-Plug 'edkolev/tmuxline.vim'
-
-" Code completion
-Plug 'Valloric/YouCompleteMe', { 'do' : '~/.vim/plugged/YouCompleteMe/install.py' }
+" Git workflow helper
+Plug 'jreybert/vimagit'
 
 " Initialize the plugin system
 call plug#end()
 
-" ===== ale =====
+" ===== coc =====
 
-" Style the error and warning signs
-let g:ale_sign_error = '✘'
-let g:ale_sign_warning = '⚠'
-highlight ALEErrorSign ctermbg=NONE ctermfg=red
-highlight ALEWarningSign ctermbg=NONE ctermfg=yellow
+" Install missing coc extensions
+let g:coc_global_extensions = ['coc-css', 'coc-eslint', 'coc-html', 'coc-json', 'coc-tsserver']
 
-" Fix JavaScript files using ESLint
-let g:ale_fixers = {
-\  '*': ['remove_trailing_lines', 'trim_whitespace'],
-\  'javascript': ['eslint'],
-\}
+" Read tsconfig.json file as jsonc to allow for comments
+autocmd BufRead,BufNewFile tsconfig.json set filetype=jsonc
 
-" Fix files on save
-let g:ale_fix_on_save = 1
+" Use tab for trigger completion with characters ahead and navigate.
+inoremap <silent><expr> <TAB>
+  \ pumvisible() ? "\<C-n>" :
+  \ <SID>check_back_space() ? "\<TAB>" :
+  \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use gh to show documentation in preview window.
+nnoremap <silent> gh :call <SID>show_documentation()<CR>
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocActionAsync('doHover')
+  endif
+endfunction
+
+" Use `[g` and `]g` to navigate diagnostics
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list."
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 " ===== fzf.vim =====
 
@@ -162,7 +177,7 @@ nnoremap <C-p> :Files<CR>
 nnoremap <C-b> :Buffers<CR>
 
 " Use ag instead of find to traverse the file system
-let $FZF_DEFAULT_COMMAND = 'ag -g ""'
+let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git -g ""'
 
 " ===== tmuxline =====
 
@@ -172,17 +187,3 @@ let g:tmuxline_powerline_separators = 0
 " ===== vim-code-dark =====
 
 colorscheme codedark
-
-" ===== YouCompleteMe =====
-
-" Close preview window once completion is accepted
-let g:ycm_autoclose_preview_window_after_completion=1
-
-" <leader>gd jumps to definition of the keyword under the cursor
-nnoremap <leader>gd :YcmCompleter GoTo<CR>
-
-" <leader>yr finds all references of the keyword under the cursor
-nnoremap <leader>yr :YcmCompleter GoToReferences<CR>
-
-" <leader>yR renames the keyword under the cursor
-nnoremap <leader>yR :YcmCompleter RefactorRename
