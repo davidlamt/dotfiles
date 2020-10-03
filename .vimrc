@@ -128,6 +128,9 @@ Plug 'pangloss/vim-javascript'
 " Better JSX indentation and syntax highlighting
 Plug 'maxmellon/vim-jsx-pretty'
 
+" Syntax highlighting for CSS-in-JS
+Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
+
 " Git workflow helper
 Plug 'jreybert/vimagit'
 
@@ -137,7 +140,7 @@ call plug#end()
 " ===== coc =====
 
 " Install missing coc extensions
-let g:coc_global_extensions = ['coc-css', 'coc-eslint', 'coc-html', 'coc-json', 'coc-tsserver']
+let g:coc_global_extensions = ['coc-css', 'coc-eslint', 'coc-html', 'coc-json', 'coc-styled-components', 'coc-tsserver']
 
 " Read tsconfig.json file as jsonc to allow for comments
 autocmd BufRead,BufNewFile tsconfig.json set filetype=jsonc
