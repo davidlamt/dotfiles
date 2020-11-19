@@ -97,6 +97,13 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+export EDITOR=vi
 export TERM=screen-256color
+export VISUAL=vi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Edit shell commands with vi
+set -o vi
+autoload edit-command-line; zle -N edit-command-line
+bindkey -M vicmd v edit-command-line
